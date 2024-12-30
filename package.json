@@ -7,6 +7,11 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
+    "start": "npx http-server -p 3000",
+    "dev": "npx http-server -p 3000 -o",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
   }
 }
