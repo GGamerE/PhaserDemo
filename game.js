@@ -5,20 +5,23 @@ class GameScene extends Phaser.Scene {
 
     preload() {
         this.load.image('sky', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA4MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjODdDRUVCIi8+Cjwvc3ZnPgo=');
-        this.load.image('ground', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMjJDNTVFIi8+Cjwvc3ZnPgo=');
         this.load.image('star', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHN0YXIgY3g9IjEyIiBjeT0iMTIiIHI9IjEwIiBmaWxsPSIjRkZENzAwIi8+Cjwvc3ZnPgo=');
         this.load.image('bomb', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTAiIGN5PSIxMCIgcj0iOCIgZmlsbD0iIzNBM0EzQSIvPgo8L3N2Zz4K');
         this.load.spritesheet('dude', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iNDgiIHZpZXdCb3g9IjAgMCAzMiA0OCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjQ4IiBmaWxsPSIjRkY2QzM3Ii8+Cjwvc3ZnPgo=', { frameWidth: 32, frameHeight: 48 });
+        
+        this.load.image('tiles', 'assets/tileset.png');
+        this.load.tilemapTiledJSON('map', 'assets/tilemap.json');
     }
 
     create() {
         this.add.image(400, 300, 'sky');
 
-        const platforms = this.physics.add.staticGroup();
-        platforms.create(400, 568, 'ground').setScale(2, 1).refreshBody();
-        platforms.create(600, 400, 'ground');
-        platforms.create(50, 250, 'ground');
-        platforms.create(750, 220, 'ground');
+        const map = this.make.tilemap({ key: 'map' });
+        const tileset = map.addTilesetImage('tileset', 'tiles');
+        const platforms = map.createLayer('Platforms', tileset, 0, 0);
+        
+        platforms.setCollisionByProperty({ collides: true });
+        platforms.setCollisionByExclusion([0]);
 
         this.player = this.physics.add.sprite(100, 450, 'dude');
         this.player.setBounce(0.2);
