@@ -11,6 +11,7 @@ class GameScene extends Phaser.Scene {
         
         this.load.image('tiles', 'assets/tileset.png');
         this.load.tilemapTiledJSON('map', 'assets/tilemap.json');
+        this.load.image('box', 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMxIiBoZWlnaHQ9IjMxIiB4PSIwLjUiIHk9IjAuNSIgZmlsbD0iI0Q4N0QzNyIgc3Ryb2tlPSIjODU0RDE2IiBzdHJva2Utd2lkdGg9IjEiLz48L3N2Zz4=');
     }
 
     create() {
@@ -47,7 +48,21 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
+        this.boxes = this.physics.add.group();
+        this.boxes.create(200, 400, 'box');
+        this.boxes.create(350, 350, 'box');
+        this.boxes.create(500, 320, 'box');
+        this.boxes.create(650, 180, 'box');
+
+        this.boxes.children.entries.forEach((box) => {
+            box.setCollideWorldBounds(true);
+            box.setBounce(0.1);
+        });
+
         this.physics.add.collider(this.player, platforms);
+        this.physics.add.collider(this.boxes, platforms);
+        this.physics.add.collider(this.player, this.boxes);
+        this.physics.add.collider(this.boxes, this.boxes);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
@@ -62,6 +77,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.physics.add.collider(this.stars, platforms);
+        this.physics.add.collider(this.stars, this.boxes);
         this.physics.add.overlap(this.player, this.stars, this.collectStar, null, this);
 
         this.score = 0;
@@ -69,6 +85,7 @@ class GameScene extends Phaser.Scene {
 
         this.bombs = this.physics.add.group();
         this.physics.add.collider(this.bombs, platforms);
+        this.physics.add.collider(this.bombs, this.boxes);
         this.physics.add.collider(this.player, this.bombs, this.hitBomb, null, this);
     }
 
@@ -76,9 +93,11 @@ class GameScene extends Phaser.Scene {
         if (this.cursors.left.isDown) {
             this.player.setVelocityX(-160);
             this.player.anims.play('left', true);
+            this.pushBoxes('left');
         } else if (this.cursors.right.isDown) {
             this.player.setVelocityX(160);
             this.player.anims.play('right', true);
+            this.pushBoxes('right');
         } else {
             this.player.setVelocityX(0);
             this.player.anims.play('turn');
@@ -87,6 +106,15 @@ class GameScene extends Phaser.Scene {
         if (this.cursors.up.isDown && this.player.body.touching.down) {
             this.player.setVelocityY(-330);
         }
+    }
+
+    pushBoxes(direction) {
+        this.boxes.children.entries.forEach((box) => {
+            if (this.physics.world.overlap(this.player, box)) {
+                const pushForce = direction === 'left' ? -50 : 50;
+                box.setVelocityX(pushForce);
+            }
+        });
     }
 
     collectStar(player, star) {
