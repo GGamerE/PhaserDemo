@@ -34,6 +34,8 @@ class GameScene extends Phaser.Scene {
         this.boxes.create(350, 350, 'box');
         this.boxes.create(500, 320, 'box');
         this.boxes.create(650, 180, 'box');
+        this.boxes.create(120, 200, 'box');
+        this.boxes.create(750, 350, 'box');
 
         this.boxes.children.entries.forEach((box) => {
             box.setCollideWorldBounds(true);
